@@ -1,0 +1,41 @@
+{
+  "name": "translate-projects-docusaurus",
+  "version": "0.0.1",
+  "description": "Easily globalize your project documentation",
+  "main": "./dist/index.js",
+  "types": "./dist/types/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prebuild": "rm -rf dist"
+  },
+  "files": [
+    "dist/",
+    "README.md",
+    "LICENSE"
+  ],
+  "devDependencies": {
+    "@types/node": "^22.10.10",
+    "typescript": "^5.7.3"
+  },
+  "keywords": [
+    "translate projects",
+    "docusaurus translate projects"
+  ],
+  "author": {
+    "name": "Neider Ruiz",
+    "email": "neiderbtc@gmail.com",
+    "url": "http://github.com/neiderruiz/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/translate-projects/translate-projects-docusaurus.git"
+  },
+  "bugs": {
+    "url": "http://github.com/translate-projects/translate-projects-docusaurus/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "translate-projects-core": "^0.0.1"
+  }
+}
