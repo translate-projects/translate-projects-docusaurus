@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
+import { escapeCharactersRegExp } from './escape-characters';
 import { extractKeysAndTexts } from './extract-keys-and-texts';
 
 type ReadFileType = {
@@ -30,7 +31,9 @@ export const syncContentFile = ({
     let translatedContent = content;
 
     for (const [key, value] of Object.entries(keysAndTexts)) {
-        translatedContent = translatedContent.replace(new RegExp(`{{${value}\\.*?}}`, 'g'), value as any);
+        const escapedValue = escapeCharactersRegExp(value as string);
+        const regex = new RegExp(`{{${escapedValue}}}`, 'g');
+        translatedContent = translatedContent.replace(regex, value);
     }
 
     // is folder doc
