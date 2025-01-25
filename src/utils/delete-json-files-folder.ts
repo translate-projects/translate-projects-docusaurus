@@ -17,7 +17,7 @@ export const deleteJsonFilesFolder = (folderPath: string) => {
             deleteJsonFilesFolder(itemPath);
         } else if (stat.isFile() && path.extname(item) === '.json') {
             fs.unlinkSync(itemPath);
-            console.log(`🛑 Recreate Files: ${itemPath} \n`);
+            console.log(`       ✅ Recreate Files: ${itemPath} \n`);
         }
     }
 };

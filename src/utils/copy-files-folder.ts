@@ -60,6 +60,6 @@ export const copyFilesFolder = ({
             fs.copyFileSync(itemPath, outputFileDoc);
         }
 
-        console.log(`🔄 (File - Copied): ${routeOutputLog}`);
+        console.log(`       🔄 (File - Copied): ${routeOutputLog} \n`);
     });
 }
