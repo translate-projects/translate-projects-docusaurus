@@ -27,7 +27,7 @@ export const generateWriteTranslations = async ({ defaultLocale, locales, apiKey
         for (const locale of locales) {
             if (locale === defaultLocale) continue;
 
-            console.log(`✅ running translations ${locale} ... \n`);
+            console.log(`     📚 Running translations (${locale}) ... \n`);
 
             await writeTranslationsCommand(locale);
 
@@ -46,7 +46,7 @@ export const generateWriteTranslations = async ({ defaultLocale, locales, apiKey
 
             fs.writeFileSync(filePathSave, JSON.stringify(restructuredJson, null, 2));
 
-            console.log(`📦  Finish success ${locale.toUpperCase()}  ${filePathSave} \n`);
+            console.log(`           ✅  Finish translate ${filePathSave} to language ${locale.toUpperCase()}   \n`);
         }
     } else {
         console.log('No se pudo leer el archivo JSON.');

@@ -29,14 +29,14 @@ export const blogTranslate = async ({
 }: TypeBlogTranslate) => {
 
     const items = fs.readdirSync(dir);
-    items.forEach(async (item) => {
+    const promises = items.map(async (item) => {
         const itemPath = path.join(dir, item);
 
         const itemRelativePath = path.relative(baseBlogDir, itemPath);
 
         if (fs.statSync(itemPath).isDirectory()) {
             // subfolder process
-            blogTranslate({
+            await blogTranslate({
                 dir: itemPath,
                 baseBlogDir,
                 defaultLocale,
@@ -112,7 +112,7 @@ export const blogTranslate = async ({
                 }
 
                 fs.writeFileSync(outputFilePath, translatedContent);
-                console.log(`✅ (Translated): ${routeOutputLog}`);
+                console.log(`       ✅ (Translated): ${routeOutputLog} \n`);
             }
         } else {
             // move file to all locales and copy to blog
@@ -128,4 +128,6 @@ export const blogTranslate = async ({
             })
         }
     });
+
+    return await Promise.all(promises)
 };

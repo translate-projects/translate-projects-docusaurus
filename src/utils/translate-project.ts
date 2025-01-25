@@ -43,6 +43,10 @@ const themeConfigDefault: ThemeConfig = {
     ignoreKeys: [],
 };
 
+const reactConfigDefault: ReactConfig = {
+    enable: true,
+};
+
 export async function translateProject({
     defaultLocale,
     locales = [],
@@ -51,9 +55,7 @@ export async function translateProject({
     config = configDefault,
     blog = blogConfigDefault,
     docs = docsConfigDefault,
-    react = {
-        enable: false
-    },
+    react = reactConfigDefault,
     theme = themeConfigDefault
 
 }: ConfigOptions): Promise<void> {
@@ -76,6 +78,11 @@ export async function translateProject({
     const theme_config = {
         ...themeConfigDefault,
         ...theme
+    }
+
+    const react_config = {
+        ...reactConfigDefault,
+        ...react
     }
 
     if (!defaultLocale) {
@@ -107,11 +114,11 @@ export async function translateProject({
         console.log('\n 🚫 Not translate docs \n');
     }
 
-    if (!react.enable) {
+    if (!react_config.enable) {
         console.log('\n 🚫 Not translate react files \n');
     }
 
-    if (blog?.enable) {
+    if (blog_config.enable) {
         if (!fs.existsSync(blog_config.baseDir)) {
             console.error(`El directorio ${blog_config.baseDir} no existe.`);
             process.exit(1);
@@ -126,11 +133,12 @@ export async function translateProject({
             apiKey,
             baseBlogDir: blog_config.baseDir,
         })
-        console.log('\n Finish translated blog 🎫')
+        console.log('\n Finish translated blog 🎫 \n')
     }
 
 
     if (docs_config.enable) {
+        console.log('🚀 Start translations documentation \n')
         if (!fs.existsSync(docs_config.baseDir)) {
             console.error(`El directorio ${docs_config.baseDir} no existe.`);
             process.exit(1);
@@ -145,18 +153,22 @@ export async function translateProject({
             apiKey
         });
 
-        console.log('\n Finish translated documents 📋')
+        console.log('\n Finish translated documentation 📋 \n')
     }
 
-    if (react.enable) {
+    if (react_config.enable) {
+        console.log('🚀 Start translations React \n')
         await generateWriteTranslations({
             locales: locales_config,
             defaultLocale: defaultLocale,
             apiKey
         })
+        console.log('\n     😎 Finish translated React Pages 📋 \n')
     }
 
     if (theme_config.enable) {
+        console.log('🚀 Start translations Theme \n')
+
         for (const locale of locales_config) {
 
             // check exist file
@@ -164,7 +176,7 @@ export async function translateProject({
 
             if (!fs.existsSync(filePath) || theme_config.recreateFiles) {
 
-                console.log(`🧑🏽‍💻 recreating translations: ${locale} \n`)
+                console.log(`       🔄 Recreating translations: ${locale} \n`)
 
                 const folderTheme = path.join('i18n', locale, 'docusaurus-theme-classic');
 
@@ -180,6 +192,8 @@ export async function translateProject({
                 ignoreKeys: theme_config.ignoreKeys
             })
         }
+
+        console.log('\n     😎 Finish translated Theme 📋 \n')
     }
 
     console.log('✅ Finish success \n');

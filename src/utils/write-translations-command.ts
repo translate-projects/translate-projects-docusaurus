@@ -4,12 +4,11 @@ import path from 'path';
 import { readJsonFile } from 'translate-projects-core/utils';
 import { removeItemsFromJson } from './remove-items-from-json';
 
-
 export const writeTranslationsCommand = async (lang: any) => {
     try {
         const command = `npm run write-translations -- --locale ${lang}`;
 
-        console.log(`\n 🚀 Running command: ${command} \n`);
+        console.log(`\n     🧪 Running command: ${command} \n`);
 
         const jsonCompact = await new Promise((resolve, reject) => {
             exec(command, (error: any, stdout: any, stderr: any) => {
@@ -35,6 +34,7 @@ export const writeTranslationsCommand = async (lang: any) => {
 
                     fs.writeFileSync(filePath, JSON.stringify(filteredJson, null, 2));
 
+                    resolve(filteredJson);
                 } else {
                     const filePath = path.join('i18n', lang, 'code.json');
 
