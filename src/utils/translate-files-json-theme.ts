@@ -19,7 +19,7 @@ export const translateFilesJsonTheme = async ({ locale, defaultLocale, apiKey, i
 
     const filesTheme = fs.readdirSync(folderTheme);
 
-    filesTheme.forEach(async (item) => {
+    const promises = filesTheme.map(async (item) => {
         const itemPath = path.join(folderTheme, item);
 
         if (fs.statSync(itemPath).isDirectory()) {
@@ -53,9 +53,11 @@ export const translateFilesJsonTheme = async ({ locale, defaultLocale, apiKey, i
 
             fs.writeFileSync(filePathSave, JSON.stringify(restructuredJson, null, 2));
 
-            console.log(`📦  Finish Translate json ${locale.toUpperCase()}  ${filePathSave} \n`);
+            console.log(`       📦  Finish Translate json ${locale.toUpperCase()}  ${filePathSave} \n`);
 
         }
     })
+
+    await Promise.all(promises)
 
 }

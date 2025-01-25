@@ -26,7 +26,8 @@ export const docsTranslate = async ({
     apiKey
 }: Options) => {
     const items = fs.readdirSync(dir);
-    items.forEach(async (item) => {
+
+    const translateFiles = items.map(async (item): Promise<any> => {
         const itemPath = path.join(dir, item);
         const itemRelativePath = path.relative(baseDocsDir, itemPath);
         if (fs.statSync(itemPath).isDirectory()) {
@@ -108,7 +109,7 @@ export const docsTranslate = async ({
                 }
 
                 fs.writeFileSync(outputFilePath, translatedContent);
-                console.log(`✅ (Translated): ${routeOutputLog}`);
+                console.log(`       ✅ (Translated): ${routeOutputLog} \n`);
             }
         } else {
             // move file to all locales and copy to docs
@@ -124,4 +125,6 @@ export const docsTranslate = async ({
             })
         }
     });
+
+    await Promise.all(translateFiles);
 };
