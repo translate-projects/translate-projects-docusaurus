@@ -34,7 +34,7 @@ export const translateFilesJsonTheme = async ({ locale, defaultLocale, apiKey, i
         if (!fs.statSync(itemPath).isDirectory() && item.endsWith('.json')) {
             const jsonData = readJsonFile(itemPath);
 
-            const { simpleKeys, flattenedJson, ignoredKeys } = flattenWriteTranslationJson(jsonData, ignoreKeys);
+            const { simpleKeys, flattenedJson, ignoredKeys } = await flattenWriteTranslationJson(jsonData, ignoreKeys);
 
             const result = await getTranslationsApi({
                 data: flattenedJson,

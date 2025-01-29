@@ -1,7 +1,7 @@
 import { TypeJson, TypeSimpleJson } from "translate-projects-core/types";
 import { generateHashText } from "translate-projects-core/utils";
 
-export const flattenWriteTranslationJson = (inputJson: FlattenWriteTranslationJson, ignore: string[] = []) => {
+export const flattenWriteTranslationJson = async (inputJson: FlattenWriteTranslationJson, ignore: string[] = []) => {
     const flattened: TypeSimpleJson = {};
     const simpleKeys: TypeSimpleJson = {};
     const ignoredKeys: TypeJson = {};
@@ -13,7 +13,7 @@ export const flattenWriteTranslationJson = (inputJson: FlattenWriteTranslationJs
                 ignoredKeys[key] = messageObj
                 continue
             }
-            const simpleKey = generateHashText(key);
+            const simpleKey = await generateHashText(key);
             simpleKeys[simpleKey] = key;
             flattened[simpleKey] = messageObj.message;
         }

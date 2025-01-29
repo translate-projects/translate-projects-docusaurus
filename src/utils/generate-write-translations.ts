@@ -23,7 +23,7 @@ export const generateWriteTranslations = async ({ defaultLocale, locales, apiKey
     const jsonData = readJsonFile(filePath);
 
     if (jsonData) {
-        const { simpleKeys, flattenedJson } = flattenWriteTranslationJson(jsonData);
+        const { simpleKeys, flattenedJson } = await flattenWriteTranslationJson(jsonData);
         for (const locale of locales) {
             if (locale === defaultLocale) continue;
 
