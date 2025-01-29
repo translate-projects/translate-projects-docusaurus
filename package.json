@@ -1,6 +1,6 @@
 {
   "name": "translate-projects-docusaurus",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Easily globalize your project documentation",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
@@ -36,6 +36,6 @@
   "license": "MIT",
   "dependencies": {
     "chokidar": "^4.0.3",
-    "translate-projects-core": "^0.0.1"
+    "translate-projects-core": "^0.0.3"
   }
 }
