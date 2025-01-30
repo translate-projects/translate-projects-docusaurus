@@ -36,6 +36,6 @@
   "license": "MIT",
   "dependencies": {
     "chokidar": "^4.0.3",
-    "translate-projects-core": "^0.0.3"
+    "translate-projects-core": "^0.0.5"
   }
 }
