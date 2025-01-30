@@ -1,4 +1,4 @@
-import { translateProject } from "./utils/translate-project";
+import { translateProject } from "./translation/translate-project";
 
 export {
     translateProject
