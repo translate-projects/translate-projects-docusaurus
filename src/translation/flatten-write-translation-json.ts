@@ -1,5 +1,6 @@
 import { TypeJson, TypeSimpleJson } from "translate-projects-core/types";
 import { generateHashText } from "translate-projects-core/utils";
+import { FlattenWriteTranslationJson } from "../types/types";
 
 export const flattenWriteTranslationJson = async (inputJson: FlattenWriteTranslationJson, ignore: string[] = []) => {
     const flattened: TypeSimpleJson = {};

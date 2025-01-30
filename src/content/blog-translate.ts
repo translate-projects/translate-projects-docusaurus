@@ -3,9 +3,8 @@ import path from 'path';
 
 import { getTranslationsApi } from 'translate-projects-core';
 import { TypeJson, TypeListLang } from 'translate-projects-core/types';
-import { copyFilesFolder } from './copy-files-folder';
-import { extractKeysAndTexts } from "./extract-keys-and-texts";
-import { replaceContentFile } from './replace-content-file';
+import { copyFilesFolder } from '../sync';
+import { extractKeysAndTexts, replaceContentFile } from "../texts";
 
 type TypeBlogTranslate = {
     dir: string;
@@ -48,7 +47,7 @@ export const blogTranslate = async ({
         } else if (item.endsWith('.md') || item.endsWith('.yml')) {
 
             const content = fs.readFileSync(itemPath, 'utf8');
-            const keysAndTexts = extractKeysAndTexts(content);
+            const keysAndTexts = await extractKeysAndTexts(content);
             const localeArray = defaultLocale ? [defaultLocale, ...locales] : locales;
 
             for (const locale of localeArray) {

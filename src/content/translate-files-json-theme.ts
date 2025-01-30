@@ -3,8 +3,8 @@ import path from 'path'
 import { getTranslationsApi } from 'translate-projects-core'
 import { TypeListLang } from 'translate-projects-core/types'
 import { readJsonFile } from 'translate-projects-core/utils'
-import { flattenWriteTranslationJson } from "./flatten-write-translation-json"
-import { restructureJson } from './restructure-json'
+import { flattenWriteTranslationJson } from "../translation"
+import { restructureJson } from '../utils'
 
 type TypeProcessJsonFolders = {
     locale: TypeListLang

@@ -1,13 +1,10 @@
 import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
-import { BlogConfig, DocsConfig, GeneralConfig, ReactConfig, ThemeConfig } from '../types/types-translate-project';
-import { blogTranslate } from './blog-translate';
-import { deleteJsonFilesFolder } from './delete-json-files-folder';
-import { detectChangeFiles } from './detect-change-files';
-import { docsTranslate } from './docs-translate';
-import { generateWriteTranslations } from './generate-write-translations';
-import { translateFilesJsonTheme } from './translate-files-json-theme';
+import { blogTranslate, docsTranslate, generateWriteTranslations, translateFilesJsonTheme } from '../content';
+import { detectChangeFiles } from '../sync';
+import { BlogConfig, DocsConfig, GeneralConfig, ReactConfig, ThemeConfig } from '../types';
+import { deleteJsonFilesFolder } from '../utils';
 import { writeTranslationsCommand } from './write-translations-command';
 
 export type ConfigOptions = {

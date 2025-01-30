@@ -2,7 +2,7 @@ import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
 import { readJsonFile } from 'translate-projects-core/utils';
-import { removeItemsFromJson } from './remove-items-from-json';
+import { removeItemsFromJson } from '../utils';
 
 export const writeTranslationsCommand = async (lang: any) => {
     try {

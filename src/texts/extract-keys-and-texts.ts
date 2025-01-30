@@ -1,6 +1,5 @@
 import { generateHashText } from "translate-projects-core/utils";
 
-
 export const extractKeysAndTexts = async (content: string): Promise<Record<string, string>> => {
     const regex = /{{([\s\S]*?)}}/g;
     let match;

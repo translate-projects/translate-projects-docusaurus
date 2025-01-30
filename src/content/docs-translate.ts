@@ -1,10 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { getTranslationsApi } from 'translate-projects-core';
-import { TypeListLang } from 'translate-projects-core/dist/types/langs';
-import { copyFilesFolder } from './copy-files-folder';
-import { extractKeysAndTexts } from "./extract-keys-and-texts";
-import { replaceContentFile } from './replace-content-file';
+import { TypeListLang } from 'translate-projects-core/types';
+import { copyFilesFolder } from '../sync';
+import { extractKeysAndTexts, replaceContentFile } from "../texts";
 
 type Options = {
     dir: string;
@@ -41,10 +40,10 @@ export const docsTranslate = async ({
                 outputDocDir,
                 apiKey
             });
-        } else if (item.endsWith('.md') || item === '_category_.json') {
+        } else if (item.endsWith('.md') || item.endsWith('.mdx')) {
             // process file `.md` o `_category_.json`
             const content = fs.readFileSync(itemPath, 'utf8');
-            const keysAndTexts = extractKeysAndTexts(content);
+            const keysAndTexts = await extractKeysAndTexts(content);
 
             const localeArray = defaultLocale ? [defaultLocale, ...locales] : locales;
 
