@@ -1,4 +1,5 @@
 import { TypeJson } from "translate-projects-core/types";
+import { FlattenWriteTranslationJson } from "../types";
 
 export const restructureJson = (flattenedJson: TypeJson, originalJson: FlattenWriteTranslationJson, simpleKeys: TypeJson) => {
     const restructured: FlattenWriteTranslationJson = {};
