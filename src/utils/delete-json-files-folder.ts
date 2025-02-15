@@ -1,9 +1,10 @@
 import fs from 'fs';
 import path from 'path';
+import { Logger } from 'translate-projects-core/utils';
 
-export const deleteJsonFilesFolder = (folderPath: string) => {
+export const deleteJsonFilesFolder = async (folderPath: string) => {
     if (!fs.existsSync(folderPath)) {
-        console.error(`The folder does not exist: ${folderPath}`);
+        await Logger.error(`The folder does not exist: ${folderPath}`);
         return;
     }
 
@@ -14,10 +15,9 @@ export const deleteJsonFilesFolder = (folderPath: string) => {
         const stat = fs.statSync(itemPath);
 
         if (stat.isDirectory()) {
-            deleteJsonFilesFolder(itemPath);
+            await deleteJsonFilesFolder(itemPath);
         } else if (stat.isFile() && path.extname(item) === '.json') {
             fs.unlinkSync(itemPath);
-            console.log(`       ✅ Recreate Files: ${itemPath} \n`);
         }
     }
 };
