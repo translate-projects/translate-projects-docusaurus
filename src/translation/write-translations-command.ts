@@ -1,19 +1,19 @@
 import { exec } from 'child_process';
 import fs from 'fs';
 import path from 'path';
-import { readJsonFile } from 'translate-projects-core/utils';
+import { Logger, readJsonFile } from 'translate-projects-core/utils';
 import { removeItemsFromJson } from '../utils';
 
 export const writeTranslationsCommand = async (lang: any) => {
     try {
         const command = `npm run write-translations -- --locale ${lang}`;
 
-        console.log(`\n     🧪 Running command: ${command} \n`);
+        await Logger.info(`🧪 Running command: ${command} \n`);
 
         const jsonCompact = await new Promise((resolve, reject) => {
-            exec(command, (error: any, stdout: any, stderr: any) => {
+            exec(command, async (error: any, stdout: any, stderr: any) => {
                 if (error) {
-                    console.error(`Error---: ${error.message}`);
+                    await Logger.error(`Error---: ${error.message}`);
                     reject(error);
                 } else if (stderr.includes('[WARNING] Some translation keys looks unknown to us')) {
 
@@ -50,6 +50,6 @@ export const writeTranslationsCommand = async (lang: any) => {
         return jsonCompact;
 
     } catch (error) {
-        console.error(`Failed to execute command: ${error}`);
+        await Logger.error(`Failed to execute command: ${error}`);
     }
 }
