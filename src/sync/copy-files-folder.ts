@@ -59,7 +59,5 @@ export const copyFilesFolder = ({
             const outputFileDoc = path.join(routeFilesDoc, item);
             fs.copyFileSync(itemPath, outputFileDoc);
         }
-
-        console.log(`       🔄 (File - Copied): ${routeOutputLog} \n`);
     });
 }

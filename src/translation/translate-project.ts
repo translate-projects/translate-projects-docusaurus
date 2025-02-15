@@ -1,17 +1,19 @@
 import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
-import { blogTranslate, docsTranslate, generateWriteTranslations, translateFilesJsonTheme } from '../content';
+import { logExecutionTime, Logger } from 'translate-projects-core/utils';
+import { blogTranslate, docsTranslate, generateWriteTranslations, syncResourcesBlogTranslate, syncResourcesDocsTranslate, syncResourcesFilesJsonTheme, translateFilesJsonTheme } from '../content';
 import { detectChangeFiles } from '../sync';
 import { BlogConfig, DocsConfig, GeneralConfig, ReactConfig, ThemeConfig } from '../types';
 import { deleteJsonFilesFolder } from '../utils';
+import { validateChangesServerFiles } from './validate-changes';
 import { writeTranslationsCommand } from './write-translations-command';
 
 export type ConfigOptions = {
     config?: GeneralConfig;
     locales: TypeListLang[];
     defaultLocale?: TypeListLang;
-    apiKey?: string;
+    apiKey: string;
     debug?: boolean;
     blog?: BlogConfig;
     docs?: DocsConfig;
@@ -57,6 +59,8 @@ export async function translateProject({
 
 }: ConfigOptions): Promise<void> {
 
+    const time_start = new Date();
+
     const blog_config = {
         ...blogConfigDefault,
         ...blog,
@@ -83,12 +87,12 @@ export async function translateProject({
     }
 
     if (!defaultLocale) {
-        console.log(`🛑 required param { config: { defaultLocale: 'es'} } \n`)
+        await Logger.error(`🛑 required param { config: { defaultLocale: 'es'} } \n`)
         return;
     }
 
     if (!locales?.length) {
-        console.log(`🛑 required param { config: { locales: ['en','fr']} } \n`)
+        await Logger.error(`🛑 required param { config: { locales: ['en','fr']} } \n`)
         return;
     }
 
@@ -104,24 +108,32 @@ export async function translateProject({
     }
 
     if (!blog_config.enable) {
-        console.log('\n 🚫 Not translate blog \n');
+        await Logger.info('Not translate blog \n');
     }
 
     if (!docs_config.enable) {
-        console.log('\n 🚫 Not translate docs \n');
+        await Logger.info('Not translate docs \n');
     }
 
     if (!react_config.enable) {
-        console.log('\n 🚫 Not translate react files \n');
+        await Logger.info('Not translate react files \n');
     }
 
     if (blog_config.enable) {
         if (!fs.existsSync(blog_config.baseDir)) {
-            console.error(`El directorio ${blog_config.baseDir} no existe.`);
+            await Logger.error(`The directory ${blog_config.baseDir} doesn't exist.`);
             process.exit(1);
         }
 
-        await blogTranslate({
+        await Logger.success(` Syncing files blog... \n`)
+
+        const filesPath = await validateChangesServerFiles({
+            apiKey,
+            dir: blog_config.baseDir
+        })
+
+        await syncResourcesBlogTranslate({
+            filesPaths: filesPath,
             dir: blog_config.baseDir,
             locales: locales_config,
             defaultLocale: defaultLocale,
@@ -130,17 +142,37 @@ export async function translateProject({
             apiKey,
             baseBlogDir: blog_config.baseDir,
         })
-        console.log('\n Finish translated blog 🎫 \n')
+
+        await blogTranslate({
+            filesPaths: filesPath,
+            dir: blog_config.baseDir,
+            locales: locales_config,
+            defaultLocale: defaultLocale,
+            outputBlogDir: blog_config.outputDir,
+            i18nDir: config_base.outputDir,
+            apiKey,
+            baseBlogDir: blog_config.baseDir,
+        })
+        await Logger.success('😎 Finish translated blog 🎫 \n')
     }
 
 
     if (docs_config.enable) {
-        console.log('🚀 Start translations documentation \n')
+        await Logger.success('🚀 Start translations documentation \n')
         if (!fs.existsSync(docs_config.baseDir)) {
-            console.error(`El directorio ${docs_config.baseDir} no existe.`);
+            Logger.error(`The directory ${docs_config.baseDir} doesn't exist.`);
             process.exit(1);
         }
-        await docsTranslate({
+
+        await Logger.info(`Syncing files documentation... \n`)
+
+        const filesPath = await validateChangesServerFiles({
+            apiKey,
+            dir: docs_config.baseDir
+        })
+
+        await syncResourcesDocsTranslate({
+            filesPaths: filesPath,
             dir: docs_config.baseDir,
             locales: locales_config,
             defaultLocale: defaultLocale,
@@ -150,48 +182,84 @@ export async function translateProject({
             apiKey
         });
 
-        console.log('\n Finish translated documentation 📋 \n')
+        await docsTranslate({
+            filesPaths: filesPath,
+            dir: docs_config.baseDir,
+            locales: locales_config,
+            defaultLocale: defaultLocale,
+            baseDocsDir: docs_config.baseDir,
+            i18nDir: config_base.outputDir,
+            outputDocDir: docs_config.outputDir,
+            apiKey
+        });
+
+        await Logger.success('😎 Finish translated documentation 📋 \n')
     }
 
     if (react_config.enable) {
-        console.log('🚀 Start translations React \n')
+
+        await Logger.success('🚀 Start translations React \n')
+
         await generateWriteTranslations({
             locales: locales_config,
             defaultLocale: defaultLocale,
             apiKey
         })
-        console.log('\n     😎 Finish translated React Pages 📋 \n')
+        await Logger.success('😎 Finish translated React Pages 📋 \n')
     }
 
     if (theme_config.enable) {
-        console.log('🚀 Start translations Theme \n')
+
+
+        await Logger.success('🚀 Start translations Theme \n')
+
+        await Logger.info('Syncing files theme... \n')
+
+        const filesPath = await validateChangesServerFiles({
+            apiKey,
+            dir: docs_config.baseDir
+        })
+
+        await syncResourcesFilesJsonTheme({
+            defaultLocale: defaultLocale,
+            apiKey,
+            ignoreKeys: theme_config.ignoreKeys
+        })
 
         for (const locale of locales_config) {
+
+            if (locale === defaultLocale) continue;
 
             // check exist file
             const filePath = path.join('i18n', locale, 'code.json');
 
             if (!fs.existsSync(filePath) || theme_config.recreateFiles) {
 
-                console.log(`       🔄 Recreating translations: ${locale} \n`)
+                await Logger.info(`🔄 Recreating translations: ${locale} \n`)
 
                 const folderTheme = path.join('i18n', locale, 'docusaurus-theme-classic');
 
-                deleteJsonFilesFolder(folderTheme);
+                await deleteJsonFilesFolder(folderTheme);
 
                 await writeTranslationsCommand(locale)
             }
 
+            await Logger.info(`Translating files theme (${locale})... \n`)
+
             await translateFilesJsonTheme({
-                locale,
+                target_lang: locale,
                 defaultLocale: defaultLocale,
                 apiKey,
                 ignoreKeys: theme_config.ignoreKeys
             })
         }
 
-        console.log('\n     😎 Finish translated Theme 📋 \n')
+        await Logger.success('😎 Finish translated Theme \n')
     }
 
-    console.log('✅ Finish success \n');
+    await Logger.success('✅ Finish translated All 📋 \n')
+
+    await logExecutionTime(time_start);
+
+    process.exit(0);
 }

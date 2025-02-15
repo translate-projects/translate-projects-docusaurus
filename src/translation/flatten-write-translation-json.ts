@@ -14,7 +14,15 @@ export const flattenWriteTranslationJson = async (inputJson: FlattenWriteTransla
                 ignoredKeys[key] = messageObj
                 continue
             }
+
             const simpleKey = await generateHashText(key);
+
+            if (simpleKey !== await generateHashText(messageObj.message)) {
+                simpleKeys[key] = key
+                flattened[key] = messageObj.message;
+                continue;
+            }
+
             simpleKeys[simpleKey] = key;
             flattened[simpleKey] = messageObj.message;
         }
