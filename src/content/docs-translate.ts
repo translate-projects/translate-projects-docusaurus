@@ -52,25 +52,27 @@ export const docsTranslate = async ({
             }
             if (defaultLocale !== locale) {
 
-                if (item.translations[defaultLocale] && item.in_cache) {
-                    if (Object.keys(item.translations[defaultLocale]).length) {
-                        translations = item.translations[defaultLocale];
+                if (item.translations[locale] && item.in_cache) {
+                    if (Object.keys(item.translations[locale]).length) {
+                        translations = item.translations[locale];
                     }
                 }
-                if (!item.translations[defaultLocale] || !item.in_cache && Object.keys(keysAndTexts).length) {
-                    await Logger.info(`Translating file ${item.path} documentation (${locale})... \n`)
-                    translations = await makeTranslations({
-                        sourceLang: defaultLocale!,
-                        targetLang: locale,
-                        apiKey,
-                        route_file: item.path,
-                        cache_hash: item.cache_hash
-                    });
+                if (!item.translations[locale] || !item.in_cache) {
+                    if (Object.keys(keysAndTexts).length) {
+                        await Logger.info(`Translating file ${item.path} documentation (${locale})... \n`)
+                        translations = await makeTranslations({
+                            sourceLang: defaultLocale!,
+                            targetLang: locale,
+                            apiKey,
+                            route_file: item.path,
+                            cache_hash: item.cache_hash
+                        });
 
-                    await updateFileCache({
-                        fileHash: key,
-                        translations: { [locale]: translations },
-                    });
+                        await updateFileCache({
+                            fileHash: key,
+                            translations: { [locale]: translations },
+                        });
+                    }
                 }
             }
 
