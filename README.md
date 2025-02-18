@@ -11,7 +11,6 @@ Easily globalize your project documentation with **Translate Projects Docusaurus
 - **Customizable**: Tailor the translation process to fit your project's needs.
 - **Open Source**: Free to use and open to contributions.
 
-
 ## Support
 
 If you have any questions, need help, or want to contribute, feel free to reach out:
@@ -20,7 +19,6 @@ If you have any questions, need help, or want to contribute, feel free to reach 
 - **GitHub**: [@neiderruiz](https://github.com/neiderruiz)
 - **Twitter**: [@neiderruiz](https://x.com/neiderruiz_)
 - **YouTube**: [Neider Ruiz](https://youtube.com/@neiderruiz)
-
 
 ## Support the Project
 
