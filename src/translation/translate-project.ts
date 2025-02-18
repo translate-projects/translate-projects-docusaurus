@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
 import { logExecutionTime, Logger } from 'translate-projects-core/utils';
-import { blogTranslate, docsTranslate, generateWriteTranslations, syncResourcesBlogTranslate, syncResourcesDocsTranslate, syncResourcesFilesJsonTheme, translateFilesJsonTheme } from '../content';
+import { blogTranslate, docsTranslate, reactTranslate, syncResourcesBlogTranslate, syncResourcesDocsTranslate, syncResourcesFilesJsonTheme, syncResourcesReactTranslate, translateFilesJsonTheme } from '../content';
 import { detectChangeFiles } from '../sync';
 import { BlogConfig, DocsConfig, GeneralConfig, ReactConfig, ThemeConfig } from '../types';
 import { deleteJsonFilesFolder } from '../utils';
@@ -200,11 +200,29 @@ export async function translateProject({
 
         await Logger.success('🚀 Start translations React \n')
 
-        await generateWriteTranslations({
+        await writeTranslationsCommand(defaultLocale);
+
+        const dirFiles = path.join('i18n', defaultLocale)
+
+        const filesPath = await validateChangesServerFiles({
+            apiKey,
+            dir: dirFiles,
+            onlyRoot: true
+        })
+
+        await syncResourcesReactTranslate({
+            filesPaths: filesPath,
+            defaultLocale,
+            apiKey,
+        })
+
+        await reactTranslate({
             locales: locales_config,
             defaultLocale: defaultLocale,
-            apiKey
+            apiKey,
+            filesPaths: filesPath
         })
+
         await Logger.success('😎 Finish translated React Pages 📋 \n')
     }
 
