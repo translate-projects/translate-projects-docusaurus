@@ -13,7 +13,6 @@ export type DocsConfig = {
 export type ThemeConfig = {
     enable: boolean;
     ignoreKeys: string[];
-    recreateFiles?: string;
 };
 
 export type ReactConfig = {
@@ -22,4 +21,5 @@ export type ReactConfig = {
 
 export type GeneralConfig = {
     outputDir: string;
+    recreateFiles?: boolean;
 };
