@@ -4,18 +4,11 @@ import path from "path";
 import { makeTranslations, syncResources } from "translate-projects-core";
 import { TypeListLang } from "translate-projects-core/types";
 import { Logger, readJsonFile, updateFileCache } from "translate-projects-core/utils";
-import { FilePathData } from "../cache/processing";
-import { flattenWriteTranslationJson, writeTranslationsCommand } from "../translation";
+import { flattenWriteTranslationJson } from "../translation";
+import { FilePathData } from "../types/file-path-data";
 import { restructureJson } from "../utils";
 
-type ConfigOptions = {
-    locales: TypeListLang[];
-    defaultLocale: TypeListLang;
-    apiKey: string;
-    filesPaths: Record<string, FilePathData>
-}
-
-type Options = {
+type SyncResourcesReactTranslateOptions = {
     defaultLocale: TypeListLang;
     apiKey: string;
     filesPaths: Record<string, FilePathData>
@@ -25,7 +18,7 @@ export const syncResourcesReactTranslate = async ({
     filesPaths,
     defaultLocale,
     apiKey
-}: Options) => {
+}: SyncResourcesReactTranslateOptions) => {
 
     const items = Object.entries(filesPaths);
 
@@ -62,7 +55,16 @@ export const syncResourcesReactTranslate = async ({
     }
 }
 
-export const reactTranslate = async ({ defaultLocale, locales, apiKey, filesPaths }: ConfigOptions) => {
+
+type ReacTranslateOptions = {
+    locales: TypeListLang[];
+    defaultLocale: TypeListLang;
+    apiKey: string;
+    filesPaths: Record<string, FilePathData>
+}
+
+
+export const reactTranslate = async ({ defaultLocale, locales, apiKey, filesPaths }: ReacTranslateOptions) => {
 
     await Logger.info('Default lang')
 
@@ -103,15 +105,14 @@ export const reactTranslate = async ({ defaultLocale, locales, apiKey, filesPath
                 if (!item.translations[locale] || !item.in_cache) {
                     if (Object.keys(jsonData).length) {
 
-                        await Logger.info(`📚 Running translations (${locale}) ... \n`);
-
-                        await writeTranslationsCommand(locale);
+                        await Logger.info(`Syncing translations (${locale}) ... \n`);
 
                         translations = await makeTranslations({
                             sourceLang: defaultLocale,
                             targetLang: locale,
                             apiKey,
-                            route_file: filePath
+                            route_file: filePath,
+                            cache_hash: item.cache_hash
                         })
 
                         await updateFileCache({
