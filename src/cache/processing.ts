@@ -1,20 +1,22 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { processFileHashCache } from 'translate-projects-core/utils';
+import { FilePathData } from '../types/file-path-data';
 
 // List of allowed extensions
 export const ALLOWED_EXTENSIONS = ['.md', '.mdx', '.yml', '.yaml', '.json', '.tsx'];
 
-// Define the type for each file's information in the path cache
-export interface FilePathData {
-    path: string;
-    cache_hash: string;
-    translations: Record<string, { [key: string]: string }>;
-    sources: Record<string, string>;
-    in_cache?: boolean;
+export type ProcessDirectoryOptions = {
+    dir: string;
+    onlyRoot?: boolean;
+    allowedExtensions?: string[];
 }
 
-export const processDirectory = async (dir: string): Promise<{
+export const processDirectory = async ({
+    dir,
+    onlyRoot = false,
+    allowedExtensions = ALLOWED_EXTENSIONS
+}: ProcessDirectoryOptions): Promise<{
     filesCache: Record<string, string>;
     filesPath: Record<string, FilePathData>;
 }> => {
@@ -31,16 +33,22 @@ export const processDirectory = async (dir: string): Promise<{
 
         // Check if it's a directory
         if (fs.statSync(itemPath).isDirectory()) {
-            // If it's a directory, process it recursively and merge results
-            const { filesCache: subFilesCache, filesPath: subFilesPath } = await processDirectory(itemPath);
-            Object.assign(filesCache, subFilesCache);
-            Object.assign(filesPath, subFilesPath);
+            if (!onlyRoot) {
+                // If it's a directory, process it recursively and merge results
+                const { filesCache: subFilesCache, filesPath: subFilesPath } = await processDirectory({
+                    dir: itemPath,
+                    allowedExtensions,
+                    onlyRoot
+                });
+                Object.assign(filesCache, subFilesCache);
+                Object.assign(filesPath, subFilesPath);
+            }
         } else {
             // Get file extension
             const fileExtension = path.extname(itemPath).toLowerCase();
 
             // Check if the extension is allowed
-            if (ALLOWED_EXTENSIONS.includes(fileExtension)) {
+            if (allowedExtensions.includes(fileExtension)) {
                 // If the file is allowed, process it
                 const { contentHash, nameHash, translations, sources } = await processFileHashCache(itemPath);
                 filesCache[nameHash] = contentHash;

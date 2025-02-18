@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
 import { logExecutionTime, Logger } from 'translate-projects-core/utils';
-import { blogTranslate, docsTranslate, generateWriteTranslations, syncResourcesBlogTranslate, syncResourcesDocsTranslate, syncResourcesFilesJsonTheme, translateFilesJsonTheme } from '../content';
+import { blogTranslate, docsTranslate, reactTranslate, syncResourcesBlogTranslate, syncResourcesDocsTranslate, syncResourcesFilesJsonTheme, syncResourcesReactTranslate, translateFilesJsonTheme } from '../content';
 import { detectChangeFiles } from '../sync';
 import { BlogConfig, DocsConfig, GeneralConfig, ReactConfig, ThemeConfig } from '../types';
 import { deleteJsonFilesFolder } from '../utils';
@@ -96,8 +96,6 @@ export async function translateProject({
         return;
     }
 
-    const locales_config = [defaultLocale, ...locales]
-
     if (debug) {
         detectChangeFiles({
             folder: './translate',
@@ -106,6 +104,28 @@ export async function translateProject({
         })
         return;
     }
+
+    const dirFiles = path.join('i18n', defaultLocale)
+
+    // refhesh folder base
+    await writeTranslationsCommand(defaultLocale);
+
+    if (!fs.existsSync(dirFiles) || config_base.recreateFiles) {
+
+        await Logger.info(`🔄 Recreating translations: ${defaultLocale} \n`)
+
+        for (const locale of locales) {
+            if (locale === defaultLocale) continue;
+            const folder_lang = path.join(config_base.outputDir, locale);
+            if (!fs.existsSync(folder_lang) || config_base.recreateFiles) {
+                await deleteJsonFilesFolder(folder_lang);
+                await writeTranslationsCommand(locale);
+                await Logger.info(`🔄 Recreating translations: ${locale} \n`)
+            }
+        }
+    }
+
+    const locales_config = [defaultLocale, ...locales]
 
     if (!blog_config.enable) {
         await Logger.info('Not translate blog \n');
@@ -117,6 +137,10 @@ export async function translateProject({
 
     if (!react_config.enable) {
         await Logger.info('Not translate react files \n');
+    }
+
+    if (!theme_config.enable) {
+        await Logger.info('Not translate theme files \n');
     }
 
     if (blog_config.enable) {
@@ -200,59 +224,60 @@ export async function translateProject({
 
         await Logger.success('🚀 Start translations React \n')
 
-        await generateWriteTranslations({
+        const dirFiles = path.join('i18n', defaultLocale)
+
+        const filesPath = await validateChangesServerFiles({
+            apiKey,
+            dir: dirFiles,
+            onlyRoot: true,
+            allowedExtensions: ['.json']
+        })
+
+        await syncResourcesReactTranslate({
+            filesPaths: filesPath,
+            defaultLocale,
+            apiKey,
+        })
+
+        await reactTranslate({
             locales: locales_config,
             defaultLocale: defaultLocale,
-            apiKey
+            apiKey,
+            filesPaths: filesPath
         })
+
         await Logger.success('😎 Finish translated React Pages 📋 \n')
     }
 
     if (theme_config.enable) {
 
-
         await Logger.success('🚀 Start translations Theme \n')
 
         await Logger.info('Syncing files theme... \n')
 
+        const folderTheme = path.join(config_base.outputDir, defaultLocale, 'docusaurus-theme-classic');
+
         const filesPath = await validateChangesServerFiles({
             apiKey,
-            dir: docs_config.baseDir
+            dir: folderTheme,
+            allowedExtensions: ['.json']
         })
 
         await syncResourcesFilesJsonTheme({
             defaultLocale: defaultLocale,
             apiKey,
-            ignoreKeys: theme_config.ignoreKeys
+            ignoreKeys: theme_config.ignoreKeys,
+            filesPaths: filesPath
         })
 
-        for (const locale of locales_config) {
-
-            if (locale === defaultLocale) continue;
-
-            // check exist file
-            const filePath = path.join('i18n', locale, 'code.json');
-
-            if (!fs.existsSync(filePath) || theme_config.recreateFiles) {
-
-                await Logger.info(`🔄 Recreating translations: ${locale} \n`)
-
-                const folderTheme = path.join('i18n', locale, 'docusaurus-theme-classic');
-
-                await deleteJsonFilesFolder(folderTheme);
-
-                await writeTranslationsCommand(locale)
-            }
-
-            await Logger.info(`Translating files theme (${locale})... \n`)
-
-            await translateFilesJsonTheme({
-                target_lang: locale,
-                defaultLocale: defaultLocale,
-                apiKey,
-                ignoreKeys: theme_config.ignoreKeys
-            })
-        }
+        await translateFilesJsonTheme({
+            defaultLocale: defaultLocale,
+            apiKey,
+            ignoreKeys: theme_config.ignoreKeys,
+            locales: locales_config,
+            filesPaths: filesPath,
+            i18nDir: config_base.outputDir,
+        })
 
         await Logger.success('😎 Finish translated Theme \n')
     }
