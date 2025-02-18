@@ -3,12 +3,12 @@ import path from 'path';
 import { makeTranslations, syncResources } from 'translate-projects-core';
 import { TypeListLang } from 'translate-projects-core/types';
 import { Logger, updateFileCache } from 'translate-projects-core/utils';
-import { FilePathData } from '../cache/processing';
 import { copyFilesFolder } from '../sync';
 import { extractKeysAndTexts, replaceContentFile } from "../texts";
+import { FilePathData } from '../types/file-path-data';
 import { generateListFilesSync } from '../utils/generate-files-sync';
 
-type Options = {
+type DocsTranslateOptions = {
     dir: string;
     baseDocsDir: string;
     i18nDir: string;
@@ -28,7 +28,7 @@ export const docsTranslate = async ({
     i18nDir,
     outputDocDir,
     apiKey
-}: Options) => {
+}: DocsTranslateOptions) => {
 
     const items = Object.entries(filesPaths);
 
@@ -43,6 +43,7 @@ export const docsTranslate = async ({
 
         for (const locale of localeArray) {
             let translations: any = {};
+
             if (defaultLocale === locale) {
                 translations = keysAndTexts;
                 await updateFileCache({
@@ -50,6 +51,7 @@ export const docsTranslate = async ({
                     translations: { [locale]: translations },
                 });
             }
+
             if (defaultLocale !== locale) {
 
                 if (item.translations[locale] && item.in_cache) {
@@ -57,6 +59,7 @@ export const docsTranslate = async ({
                         translations = item.translations[locale];
                     }
                 }
+
                 if (!item.translations[locale] || !item.in_cache) {
                     if (Object.keys(keysAndTexts).length) {
                         await Logger.info(`Translating file ${item.path} documentation (${locale})... \n`)
@@ -143,7 +146,7 @@ export const syncResourcesDocsTranslate = async ({
     filesPaths,
     defaultLocale,
     apiKey
-}: Options) => {
+}: DocsTranslateOptions) => {
 
     const items = Object.entries(filesPaths);
 
