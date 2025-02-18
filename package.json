@@ -4,9 +4,20 @@
   "description": "Easily globalize your project documentation",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
+  "type": "module",
   "scripts": {
     "build": "tsc",
-    "prebuild": "rm -rf dist"
+    "prebuild": "rm -rf dist",
+    "postinstall": "husky",
+    "lint": "eslint src",
+    "format": "prettier --write .",
+    "lint:fix": "eslint src --fix"
+  },
+  "lint-staged": {
+    "**/*.{js,ts,json,md}": [
+      "prettier --write",
+      "eslint --fix"
+    ]
   },
   "files": [
     "dist/",
@@ -15,6 +26,14 @@
   ],
   "devDependencies": {
     "@types/node": "^22.10.10",
+    "@typescript-eslint/eslint-plugin": "^8.24.1",
+    "@typescript-eslint/parser": "^8.24.1",
+    "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.4.3",
+    "prettier": "^3.5.1",
     "typescript": "^5.7.3"
   },
   "keywords": [
