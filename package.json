@@ -1,6 +1,6 @@
 {
   "name": "translate-projects-docusaurus",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Easily globalize your project documentation",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
