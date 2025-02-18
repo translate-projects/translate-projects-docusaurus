@@ -3,4 +3,4 @@ export type FlattenWriteTranslationJson = {
     message: string;
     description?: string;
   };
-}
+};

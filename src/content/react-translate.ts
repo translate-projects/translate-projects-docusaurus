@@ -1,142 +1,150 @@
-import fs from "fs";
-import path from "path";
+import fs from 'fs';
+import path from 'path';
 
-import { makeTranslations, syncResources } from "translate-projects-core";
-import { TypeListLang } from "translate-projects-core/types";
-import { Logger, readJsonFile, updateFileCache } from "translate-projects-core/utils";
-import { flattenWriteTranslationJson } from "../translation";
-import { FilePathData } from "../types/file-path-data";
-import { restructureJson } from "../utils";
+import { makeTranslations, syncResources } from 'translate-projects-core';
+import { TypeJson, TypeListLang } from 'translate-projects-core/types';
+import {
+  Logger,
+  readJsonFile,
+  updateFileCache,
+} from 'translate-projects-core/utils';
+import { flattenWriteTranslationJson } from '../translation';
+import { FilePathData } from '../types/file-path-data';
+import { restructureJson } from '../utils';
 
 type SyncResourcesReactTranslateOptions = {
-    defaultLocale: TypeListLang;
-    apiKey: string;
-    filesPaths: Record<string, FilePathData>
-}
+  defaultLocale: TypeListLang;
+  apiKey: string;
+  filesPaths: Record<string, FilePathData>;
+};
 
 export const syncResourcesReactTranslate = async ({
-    filesPaths,
-    defaultLocale,
-    apiKey
+  filesPaths,
+  defaultLocale,
+  apiKey,
 }: SyncResourcesReactTranslateOptions) => {
+  const items = Object.entries(filesPaths);
 
-    const items = Object.entries(filesPaths);
-
-    for (const [key, item] of items) {
-        // if any file in cache
-        if (item.in_cache && Object.keys(item.sources).length) {
-            continue;
-        }
-
-        const jsonData = readJsonFile(item.path);
-
-        const { flattenedJson } = await flattenWriteTranslationJson(jsonData);
-
-        if (!Object.keys(flattenedJson).length) {
-            await Logger.info(`❌ No se encontraron claves en ${item.path}. \n`)
-            continue;
-        }
-
-        await Logger.info(`🔄 Syncing (${Object.keys(flattenedJson).length}) - ${item.path}... \n`);
-
-        await syncResources({
-            sourceLang: defaultLocale!,
-            data: flattenedJson,
-            typeProject: 'docusaurus',
-            apiKey,
-            route_file: item.path,
-            cache_hash: item.cache_hash
-        });
-
-        await updateFileCache({
-            fileHash: key,
-            sources: flattenedJson,
-        });
+  for (const [key, item] of items) {
+    // if any file in cache
+    if (item.in_cache && Object.keys(item.sources).length) {
+      continue;
     }
-}
 
+    const jsonData = readJsonFile(item.path);
+
+    const { flattenedJson } = await flattenWriteTranslationJson(jsonData);
+
+    if (!Object.keys(flattenedJson).length) {
+      await Logger.info(`❌ No se encontraron claves en ${item.path}. \n`);
+      continue;
+    }
+
+    await Logger.info(
+      `🔄 Syncing (${Object.keys(flattenedJson).length}) - ${item.path}... \n`
+    );
+
+    await syncResources({
+      sourceLang: defaultLocale!,
+      data: flattenedJson,
+      typeProject: 'docusaurus',
+      apiKey,
+      route_file: item.path,
+      cache_hash: item.cache_hash,
+    });
+
+    await updateFileCache({
+      fileHash: key,
+      sources: flattenedJson,
+    });
+  }
+};
 
 type ReacTranslateOptions = {
-    locales: TypeListLang[];
-    defaultLocale: TypeListLang;
-    apiKey: string;
-    filesPaths: Record<string, FilePathData>
-}
+  locales: TypeListLang[];
+  defaultLocale: TypeListLang;
+  apiKey: string;
+  filesPaths: Record<string, FilePathData>;
+};
 
+export const reactTranslate = async ({
+  defaultLocale,
+  locales,
+  apiKey,
+  filesPaths,
+}: ReacTranslateOptions) => {
+  await Logger.info('Default lang');
 
-export const reactTranslate = async ({ defaultLocale, locales, apiKey, filesPaths }: ReacTranslateOptions) => {
+  const filePath = path.join('i18n', defaultLocale, 'code.json');
 
-    await Logger.info('Default lang')
+  // react translations in JSON file
+  const jsonData = readJsonFile(filePath);
 
-    const filePath = path.join('i18n', defaultLocale, 'code.json');
+  const { simpleKeys, flattenedJson } =
+    await flattenWriteTranslationJson(jsonData);
 
-    // react translations in JSON file
-    const jsonData = readJsonFile(filePath);
+  const items = Object.entries(filesPaths);
 
-    const { simpleKeys, flattenedJson } = await flattenWriteTranslationJson(jsonData);
+  for (const [key, item] of items) {
+    for (const locale of locales) {
+      const filePathSave = path.join('i18n', locale, 'code.json');
 
-    const items = Object.entries(filesPaths);
+      let translations: TypeJson = {};
 
-    for (const [key, item] of items) {
-        for (const locale of locales) {
+      if (locale === defaultLocale) {
+        translations = flattenedJson;
 
-            const filePathSave = path.join('i18n', locale, 'code.json');
+        await updateFileCache({
+          fileHash: key,
+          translations: { [locale]: translations },
+        });
+      }
 
-            let translations: any = {};
-
-            if (locale === defaultLocale) {
-
-                translations = flattenedJson;
-
-                await updateFileCache({
-                    fileHash: key,
-                    translations: { [locale]: translations },
-                });
-            };
-
-            if (defaultLocale !== locale) {
-
-                if (item.translations[locale] && item.in_cache) {
-                    if (Object.keys(item.translations[locale]).length) {
-                        translations = item.translations[locale];
-                    }
-                }
-
-                if (!item.translations[locale] || !item.in_cache) {
-                    if (Object.keys(jsonData).length) {
-
-                        await Logger.info(`Syncing translations (${locale}) ... \n`);
-
-                        translations = await makeTranslations({
-                            sourceLang: defaultLocale,
-                            targetLang: locale,
-                            apiKey,
-                            route_file: filePath,
-                            cache_hash: item.cache_hash
-                        })
-
-                        await updateFileCache({
-                            fileHash: key,
-                            translations: { [locale]: translations },
-                        });
-
-                    }
-                }
-
-            }
-
-            if (!translations) {
-                await Logger.error(`Don't translate file ${filePath} to ${locale}`);
-                continue;
-            }
-
-            const restructuredJson = restructureJson(translations, jsonData, simpleKeys);
-
-            fs.writeFileSync(filePathSave, JSON.stringify(restructuredJson, null, 2));
-
-            if (locale !== defaultLocale) {
-                await Logger.success(`Finish translate ${filePathSave} to language ${locale.toUpperCase()}   \n`);
-            }
+      if (defaultLocale !== locale) {
+        if (item.translations[locale] && item.in_cache) {
+          if (Object.keys(item.translations[locale]).length) {
+            translations = item.translations[locale];
+          }
         }
+
+        if (!item.translations[locale] || !item.in_cache) {
+          if (Object.keys(jsonData).length) {
+            await Logger.info(`Syncing translations (${locale}) ... \n`);
+
+            translations = await makeTranslations({
+              sourceLang: defaultLocale,
+              targetLang: locale,
+              apiKey,
+              route_file: filePath,
+              cache_hash: item.cache_hash,
+            });
+
+            await updateFileCache({
+              fileHash: key,
+              translations: { [locale]: translations },
+            });
+          }
+        }
+      }
+
+      if (!translations) {
+        await Logger.error(`Don't translate file ${filePath} to ${locale}`);
+        continue;
+      }
+
+      const restructuredJson = restructureJson(
+        translations,
+        jsonData,
+        simpleKeys
+      );
+
+      fs.writeFileSync(filePathSave, JSON.stringify(restructuredJson, null, 2));
+
+      if (locale !== defaultLocale) {
+        await Logger.success(
+          `Finish translate ${filePathSave} to language ${locale.toUpperCase()}   \n`
+        );
+      }
     }
-}
+  }
+};

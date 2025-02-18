@@ -1,12 +1,16 @@
-export const removeItemsFromJson = (jsonData: any, itemsDelete: string[]) => {
+import { TypeJson } from 'translate-projects-core/types';
 
-    const filteredData: any = {};
+export const removeItemsFromJson = (
+  jsonData: TypeJson,
+  itemsDelete: string[]
+) => {
+  const filteredData: TypeJson = {};
 
-    for (const key in jsonData) {
-        if (!itemsDelete.includes(key)) {
-            filteredData[key] = jsonData[key];
-        }
+  for (const key in jsonData) {
+    if (!itemsDelete.includes(key)) {
+      filteredData[key] = jsonData[key];
     }
+  }
 
-    return filteredData;
-}
+  return filteredData;
+};
