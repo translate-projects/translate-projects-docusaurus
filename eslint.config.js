@@ -1,3 +1,6 @@
+import eslintConfigPrettier from 'eslint-config-prettier';
+import eslintPluginPrettier from 'eslint-plugin-prettier';
+
 export default [
   {
     ignores: ['node_modules', 'dist'],
@@ -8,10 +11,10 @@ export default [
       sourceType: 'module',
     },
     plugins: {
-      prettier: require('eslint-plugin-prettier'),
+      prettier: eslintPluginPrettier,
     },
     rules: {
-      ...require('eslint-config-prettier').rules,
+      ...eslintConfigPrettier.rules,
       'prettier/prettier': 'error',
     },
   },

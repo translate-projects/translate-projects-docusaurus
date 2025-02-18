@@ -8,9 +8,9 @@
   "scripts": {
     "build": "tsc",
     "prebuild": "rm -rf dist",
-    "lint": "eslint src",
+    "lint": "eslint",
     "format": "prettier --write .",
-    "lint:fix": "eslint src --fix",
+    "lint:fix": "eslint --fix",
     "prepare": "husky"
   },
   "lint-staged": {
@@ -51,6 +51,8 @@
   "license": "MIT",
   "dependencies": {
     "chokidar": "^4.0.3",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "translate-projects-core": "^0.0.6"
   }
 }
