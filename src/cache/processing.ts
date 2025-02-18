@@ -14,7 +14,7 @@ export interface FilePathData {
     in_cache?: boolean;
 }
 
-export const processDirectory = async (dir: string): Promise<{
+export const processDirectory = async (dir: string, onlyRoot?: boolean): Promise<{
     filesCache: Record<string, string>;
     filesPath: Record<string, FilePathData>;
 }> => {
@@ -31,10 +31,12 @@ export const processDirectory = async (dir: string): Promise<{
 
         // Check if it's a directory
         if (fs.statSync(itemPath).isDirectory()) {
-            // If it's a directory, process it recursively and merge results
-            const { filesCache: subFilesCache, filesPath: subFilesPath } = await processDirectory(itemPath);
-            Object.assign(filesCache, subFilesCache);
-            Object.assign(filesPath, subFilesPath);
+            if (!onlyRoot) {
+                // If it's a directory, process it recursively and merge results
+                const { filesCache: subFilesCache, filesPath: subFilesPath } = await processDirectory(itemPath);
+                Object.assign(filesCache, subFilesCache);
+                Object.assign(filesPath, subFilesPath);
+            }
         } else {
             // Get file extension
             const fileExtension = path.extname(itemPath).toLowerCase();
