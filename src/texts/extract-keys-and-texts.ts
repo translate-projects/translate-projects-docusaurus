@@ -8,7 +8,8 @@ export const extractKeysAndTexts = async (
   const result: Record<string, string> = {};
 
   while ((match = regex.exec(content)) !== null) {
-    result[await generateHashText(match[1])] = match[1];
+      const text = match[1].trim();
+      result[await generateHashText(text)] = text;
   }
 
   return result;
