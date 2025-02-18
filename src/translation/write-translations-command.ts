@@ -3,7 +3,6 @@ import fs from 'fs';
 import path from 'path';
 import { Logger, readJsonFile } from 'translate-projects-core/utils';
 import { removeItemsFromJson } from '../utils';
-
 export const writeTranslationsCommand = async (lang: string) => {
   try {
     const command = `npm run write-translations -- --locale ${lang}`;
