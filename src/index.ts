@@ -1,6 +1,3 @@
-import { translateProject } from "./translation/translate-project";
+import { translateProject } from './translation/translate-project';
 
-export {
-    translateProject
-};
-
+export { translateProject };
