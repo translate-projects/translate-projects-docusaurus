@@ -8,7 +8,6 @@
   "scripts": {
     "build": "tsc",
     "prebuild": "rm -rf dist",
-    "postinstall": "husky",
     "lint": "eslint src",
     "format": "prettier --write .",
     "lint:fix": "eslint src --fix",
