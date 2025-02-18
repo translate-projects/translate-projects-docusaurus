@@ -99,7 +99,6 @@ export const blogTranslate = async ({
                 fs.mkdirSync(localeDir, { recursive: true });
             }
 
-            const outputFilePath = path.join(localeDir, itemPath);
 
             if (defaultLocale === locale) {
                 const baseDocsPath = path.join(
@@ -120,7 +119,10 @@ export const blogTranslate = async ({
                 fs.writeFileSync(routeFileSaveDoc, translatedContent);
             }
 
-            fs.writeFileSync(outputFilePath, translatedContent);
+            if (defaultLocale !== locale) {
+                const outputFilePath = path.join(localeDir, itemPath);
+                fs.writeFileSync(outputFilePath, translatedContent);
+            }
         }
     }
 
