@@ -4,9 +4,9 @@ import path from 'path';
 import { makeTranslations, syncResources } from 'translate-projects-core';
 import { TypeJson, TypeListLang } from 'translate-projects-core/types';
 import { Logger, updateFileCache } from 'translate-projects-core/utils';
-import { FilePathData } from '../cache/processing';
 import { copyFilesFolder } from '../sync';
 import { extractKeysAndTexts, replaceContentFile } from "../texts";
+import { FilePathData } from '../types/file-path-data';
 import { generateListFilesSync } from '../utils/generate-files-sync';
 
 type TypeBlogTranslate = {
