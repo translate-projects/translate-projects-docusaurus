@@ -36,7 +36,7 @@ export const syncResourcesReactTranslate = async ({
     const { flattenedJson } = await flattenWriteTranslationJson(jsonData);
 
     if (!Object.keys(flattenedJson).length) {
-      await Logger.info(`❌ No se encontraron claves en ${item.path}. \n`);
+      await Logger.info(`❌ Not found keys in ${item.path}. \n`);
       continue;
     }
 
