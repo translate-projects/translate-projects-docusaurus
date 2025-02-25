@@ -93,6 +93,10 @@ export const translateFilesJsonTheme = async ({
       };
 
       try {
+        if (!fs.existsSync(localeDir)) {
+          fs.mkdirSync(localeDir, { recursive: true });
+        }
+
         fs.writeFileSync(
           outputFilePath,
           JSON.stringify(restructuredJson, null, 2)
