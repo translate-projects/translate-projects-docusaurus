@@ -21,10 +21,11 @@ import {
   ThemeConfig,
 } from '../types';
 import { deleteJsonFilesFolder } from '../utils';
+import { syncFoldersBase } from './sync-folders-base';
 import { validateChangesServerFiles } from './validate-changes';
 import { writeTranslationsCommand } from './write-translations-command';
 
-export type ConfigOptions = {
+export type TranslateProjectsConfig = {
   config?: GeneralConfig;
   locales: TypeListLang[];
   defaultLocale?: TypeListLang;
@@ -71,7 +72,7 @@ export async function translateProject({
   docs = docsConfigDefault,
   react = reactConfigDefault,
   theme = themeConfigDefault,
-}: ConfigOptions): Promise<void> {
+}: TranslateProjectsConfig): Promise<void> {
   const time_start = new Date();
 
   const blog_config = {
@@ -122,6 +123,23 @@ export async function translateProject({
     return;
   }
 
+  // blog sync
+  await syncFoldersBase({
+    apiKey,
+    baseDir: blog_config.baseDir,
+    outputDir: blog_config.outputDir,
+    sourceLang: defaultLocale,
+  });
+
+  // docs sync
+  await syncFoldersBase({
+    apiKey,
+    baseDir: docs_config.baseDir,
+    outputDir: docs_config.outputDir,
+    sourceLang: defaultLocale,
+  });
+
+  // folder docs sync
   const dirFiles = path.join('i18n', defaultLocale);
 
   // refhesh folder base

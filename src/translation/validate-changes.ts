@@ -28,7 +28,7 @@ export const validateChangesServerFiles = async ({
     data: filesCache,
   });
 
-  if (!result.data) {
+  if (!result?.data) {
     return {};
   }
 

@@ -59,7 +59,9 @@ export const processDirectory = async ({
       if (allowedExtensions.includes(fileExtension)) {
         // If the file is allowed, process it
         const { contentHash, nameHash, translations, sources } =
-          await processFileHashCache(itemPath);
+          await processFileHashCache({
+            filePath: itemPath,
+          });
         filesCache[nameHash] = contentHash;
         filesPath[nameHash] = {
           path: itemPath,

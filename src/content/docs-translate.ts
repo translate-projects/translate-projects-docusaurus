@@ -156,7 +156,7 @@ export const syncResourcesDocsTranslate = async ({
     const keysAndTexts = await extractKeysAndTexts(content);
 
     if (!Object.keys(keysAndTexts).length) {
-      await Logger.info(`❌ No se encontraron claves en ${item.path}. \n`);
+      await Logger.info(`❌ Not found keys in ${item.path}. \n`);
       continue;
     }
 
