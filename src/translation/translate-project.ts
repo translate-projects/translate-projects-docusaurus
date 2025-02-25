@@ -25,7 +25,7 @@ import { syncFoldersBase } from './sync-folders-base';
 import { validateChangesServerFiles } from './validate-changes';
 import { writeTranslationsCommand } from './write-translations-command';
 
-export type ConfigOptions = {
+export type TranslateProjectsConfig = {
   config?: GeneralConfig;
   locales: TypeListLang[];
   defaultLocale?: TypeListLang;
@@ -72,7 +72,7 @@ export async function translateProject({
   docs = docsConfigDefault,
   react = reactConfigDefault,
   theme = themeConfigDefault,
-}: ConfigOptions): Promise<void> {
+}: TranslateProjectsConfig): Promise<void> {
   const time_start = new Date();
 
   const blog_config = {
