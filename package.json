@@ -4,6 +4,21 @@
   "description": "Easily globalize your project documentation",
   "main": "./dist/index.js",
   "types": "./dist/types/index.d.ts",
+  "exports": {
+    ".": "./dist/index.js",
+    "./utils": "./dist/utils/index.js",
+    "./types": "./dist/types/index.js"
+  },
+  "typesVersions": {
+    "*": {
+      "utils": [
+        "./dist/utils/index.d.ts"
+      ],
+      "types": [
+        "./dist/types/index.d.ts"
+      ]
+    }
+  },
   "scripts": {
     "build": "tsc",
     "prebuild": "rm -rf dist",
@@ -11,6 +26,9 @@
     "format": "prettier --write .",
     "lint:fix": "eslint --fix",
     "prepare": "husky"
+  },
+  "bin": {
+    "translate-projects-docusaurus": "./dist/cli/cli.js"
   },
   "lint-staged": {
     "**/*.{js,ts,json,md}": [
@@ -23,12 +41,19 @@
     "README.md",
     "LICENSE"
   ],
+  "dependencies": {
+    "chokidar": "^4.0.3",
+    "translate-projects-core": "0.0.9"
+  },
   "devDependencies": {
     "@types/node": "^22.10.10",
     "eslint": "^9.20.1",
+    "eslint-config-prettier": "^10.0.1",
+    "eslint-plugin-prettier": "^5.2.3",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
     "prettier": "3.5.1",
+    "ts-node": "^10.9.2",
     "typescript": "^5.7.3"
   },
   "keywords": [
@@ -47,11 +72,5 @@
   "bugs": {
     "url": "http://github.com/translate-projects/translate-projects-docusaurus/issues"
   },
-  "license": "MIT",
-  "dependencies": {
-    "chokidar": "^4.0.3",
-    "eslint-config-prettier": "^10.0.1",
-    "eslint-plugin-prettier": "^5.2.3",
-    "translate-projects-core": "^0.0.6"
-  }
+  "license": "MIT"
 }
