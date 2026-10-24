@@ -121,6 +121,7 @@ Options accepted by `translateProject`:
 | `locales`              | `string[]` | — (required)       | Target languages.                                                     |
 | `apiKey`               | `string`   | — (required)       | Your Translate Projects API key.                                      |
 | `debug`                | `boolean`  | `true`             | `true` runs watch mode only (no API calls). Set `false` to translate. |
+| `force`                | `boolean`  | `false`            | Ignore the cache and translate every file again (CLI: `--force`).     |
 | `config.outputDir`     | `string`   | `./i18n`           | Docusaurus i18n folder.                                               |
 | `config.recreateFiles` | `boolean`  | `false`            | Regenerate `i18n/<lang>` files with `write-translations`.             |
 | `docs.enable`          | `boolean`  | `true`             | Translate docs.                                                       |
