@@ -10,6 +10,7 @@ Easily globalize your Docusaurus documentation. **Translate Projects Docusaurus*
 - **React pages & theme**: translates `i18n/<lang>/code.json` and `docusaurus-theme-classic` JSON files.
 - **Incremental**: files are hashed and cached; only new or changed files are sent to the API.
 - **Assets synced**: non-text files (images, etc.) are copied to every locale folder.
+- **Safe on API errors**: a failed or partial translation (invalid token, 4xx/5xx, project without AI key) keeps the source text, never writes broken files, is retried on the next run and exits with code 1.
 - **Watch mode**: `--dev` watches `./translate` and syncs changes to the default locale instantly, without calling the API.
 
 ## Installation

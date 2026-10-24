@@ -123,21 +123,16 @@ export async function translateProject({
     return;
   }
 
-  // blog sync
-  await syncFoldersBase({
-    apiKey,
-    baseDir: blog_config.baseDir,
-    outputDir: blog_config.outputDir,
-    sourceLang: defaultLocale,
-  });
-
-  // docs sync
-  await syncFoldersBase({
-    apiKey,
-    baseDir: docs_config.baseDir,
-    outputDir: docs_config.outputDir,
-    sourceLang: defaultLocale,
-  });
+  // write docs/ and blog/ first: write-translations below reads them
+  for (const section of [blog_config, docs_config]) {
+    if (!section.enable || !fs.existsSync(section.baseDir)) continue;
+    await syncFoldersBase({
+      apiKey,
+      baseDir: section.baseDir,
+      outputDir: section.outputDir,
+      sourceLang: defaultLocale,
+    });
+  }
 
   // refhesh folder base
   await writeTranslationsCommand(defaultLocale);
@@ -146,7 +141,7 @@ export async function translateProject({
     if (locale === defaultLocale) continue;
     const folder_lang = path.join(config_base.outputDir, locale);
     if (!fs.existsSync(folder_lang) || config_base.recreateFiles) {
-      await deleteJsonFilesFolder(folder_lang);
+      if (fs.existsSync(folder_lang)) await deleteJsonFilesFolder(folder_lang);
       await writeTranslationsCommand(locale);
       await Logger.info(`🔄 Recreating translations: ${locale} \n`);
     }

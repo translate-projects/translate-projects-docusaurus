@@ -10,7 +10,7 @@ import {
 } from 'translate-projects-core/utils';
 import { flattenWriteTranslationJson } from '../translation';
 import { FilePathData } from '../types/file-path-data';
-import { restructureJson } from '../utils';
+import { pickTranslations, restructureJson } from '../utils';
 
 type SyncResourcesReactTranslateOptions = {
   defaultLocale: TypeListLang;
@@ -107,7 +107,11 @@ export const reactTranslate = async ({
           }
         }
 
-        if (!item.translations[locale] || !item.in_cache) {
+        if (
+          !item.in_cache ||
+          pickTranslations(item.translations[locale], flattenedJson).missing
+            .length
+        ) {
           if (Object.keys(jsonData).length) {
             await Logger.info(`Syncing translations (${locale}) ... \n`);
 
@@ -123,6 +127,15 @@ export const reactTranslate = async ({
               await Logger.error(`❌ Not translated ${filePath} (${locale})`);
               process.exitCode = 1;
               continue;
+            }
+
+            const picked = pickTranslations(translations, flattenedJson);
+            translations = picked.translations;
+            if (picked.missing.length) {
+              await Logger.warning(
+                `⚠️ ${picked.missing.length} texts not translated in ${item.path} (${locale}), source text kept`
+              );
+              process.exitCode = 1;
             }
 
             await updateFileCache({

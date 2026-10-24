@@ -7,6 +7,7 @@ import { Logger, updateFileCache } from 'translate-projects-core/utils';
 import { copyFilesFolder } from '../sync';
 import { extractKeysAndTexts, replaceContentFile } from '../texts';
 import { FilePathData } from '../types/file-path-data';
+import { pickTranslations } from '../utils';
 import { generateListFilesSync } from '../utils/generate-files-sync';
 
 type TypeBlogTranslate = {
@@ -59,8 +60,9 @@ export const blogTranslate = async ({
         }
 
         if (
-          !item.translations[locale] ||
-          (!item.in_cache && Object.keys(keysAndTexts).length)
+          !item.in_cache ||
+          pickTranslations(item.translations[locale], keysAndTexts).missing
+            .length
         ) {
           if (Object.keys(keysAndTexts).length) {
             await Logger.info(
@@ -79,6 +81,15 @@ export const blogTranslate = async ({
               await Logger.error(`❌ Not translated ${item.path} (${locale})`);
               process.exitCode = 1;
               continue;
+            }
+
+            const picked = pickTranslations(translations, keysAndTexts);
+            translations = picked.translations;
+            if (picked.missing.length) {
+              await Logger.warning(
+                `⚠️ ${picked.missing.length} texts not translated in ${item.path} (${locale}), source text kept`
+              );
+              process.exitCode = 1;
             }
 
             await updateFileCache({

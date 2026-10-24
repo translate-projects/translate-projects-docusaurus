@@ -9,7 +9,7 @@ import {
 } from 'translate-projects-core/utils';
 import { flattenWriteTranslationJson } from '../translation';
 import { FilePathData } from '../types/file-path-data';
-import { restructureJson } from '../utils';
+import { pickTranslations, restructureJson } from '../utils';
 
 type TranslateFilesJsonThemeOptions = {
   defaultLocale: TypeListLang;
@@ -56,7 +56,11 @@ export const translateFilesJsonTheme = async ({
             translations = item.translations[locale];
           }
         }
-        if (!item.translations[locale] || !item.in_cache) {
+        if (
+          !item.in_cache ||
+          pickTranslations(item.translations[locale], flattenedJson).missing
+            .length
+        ) {
           if (Object.keys(jsonData).length) {
             translations = await makeTranslations({
               sourceLang: defaultLocale,
@@ -72,6 +76,15 @@ export const translateFilesJsonTheme = async ({
               );
               process.exitCode = 1;
               continue;
+            }
+
+            const picked = pickTranslations(translations, flattenedJson);
+            translations = picked.translations;
+            if (picked.missing.length) {
+              await Logger.warning(
+                `⚠️ ${picked.missing.length} texts not translated in ${item.path} (${locale}), source text kept`
+              );
+              process.exitCode = 1;
             }
 
             await updateFileCache({

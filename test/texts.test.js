@@ -35,3 +35,16 @@ test('missing translations fall back to the source text, never "undefined"', asy
   });
   assert.strictEqual(none, 'Hola Mundo');
 });
+
+test('pickTranslations keeps only the file keys and lists the missing ones', () => {
+  const { pickTranslations } = require('../dist/utils');
+  const all = { a: 'A', b: 'B', other: 'X', c: null };
+  assert.deepStrictEqual(
+    pickTranslations(all, { a: 'a', b: 'b', c: 'c', d: 'd' }),
+    {
+      translations: { a: 'A', b: 'B' },
+      missing: ['c', 'd'],
+    }
+  );
+  assert.deepStrictEqual(pickTranslations(null, { a: 'a' }).missing, ['a']);
+});
