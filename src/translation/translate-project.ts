@@ -31,6 +31,8 @@ export type TranslateProjectsConfig = {
   defaultLocale?: TypeListLang;
   apiKey: string;
   debug?: boolean;
+  // ignore the cache: re-send and re-translate every file (e.g. after editing translations in the dashboard)
+  force?: boolean;
   blog?: BlogConfig;
   docs?: DocsConfig;
   react?: ReactConfig;
@@ -67,6 +69,7 @@ export async function translateProject({
   locales = [],
   apiKey,
   debug = true,
+  force = false,
   config = configDefault,
   blog = blogConfigDefault,
   docs = docsConfigDefault,
@@ -176,6 +179,7 @@ export async function translateProject({
 
     const filesPath = await validateChangesServerFiles({
       apiKey,
+      force,
       dir: blog_config.baseDir,
     });
 
@@ -215,6 +219,7 @@ export async function translateProject({
 
     const filesPath = await validateChangesServerFiles({
       apiKey,
+      force,
       dir: docs_config.baseDir,
     });
 
@@ -250,6 +255,7 @@ export async function translateProject({
 
     const filesPath = await validateChangesServerFiles({
       apiKey,
+      force,
       dir: dirFiles,
       onlyRoot: true,
       allowedExtensions: ['.json'],
@@ -284,6 +290,7 @@ export async function translateProject({
 
     const filesPath = await validateChangesServerFiles({
       apiKey,
+      force,
       dir: folderTheme,
       allowedExtensions: ['.json'],
     });

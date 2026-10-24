@@ -8,6 +8,7 @@ type ValidateChangesServerFilesOptions = {
   apiKey: string;
   onlyRoot?: boolean;
   allowedExtensions?: string[];
+  force?: boolean;
 };
 
 export const validateChangesServerFiles = async ({
@@ -15,6 +16,7 @@ export const validateChangesServerFiles = async ({
   dir,
   onlyRoot,
   allowedExtensions,
+  force = false,
 }: ValidateChangesServerFilesOptions): Promise<
   Record<string, FilePathData>
 > => {
@@ -36,7 +38,7 @@ export const validateChangesServerFiles = async ({
   }
 
   for (const fileHash of Object.keys(filesPath)) {
-    filesPath[fileHash].in_cache = Boolean(!result.data[fileHash]);
+    filesPath[fileHash].in_cache = !force && !result.data[fileHash];
   }
 
   return filesPath;

@@ -86,7 +86,8 @@ Add scripts to `package.json`:
 ```
 
 ```bash
-npm run translate       # translate everything
+npm run translate       # translate what changed
+npx translate-projects-docusaurus --force  # re-translate everything, ignoring the cache
 npm run translate:dev   # watch ./translate and sync the default locale
 ```
 

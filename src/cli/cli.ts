@@ -37,6 +37,7 @@ async function runCLI() {
       defaultLocale: config.sourceLang ?? config.defaultLocale,
       locales: config.targetLangs ?? config.locales,
       debug: isDev || Boolean(config.debug),
+      force: process.argv.includes('--force') || Boolean(config.force),
     });
   } catch (err: any) {
     await Logger.error(err.message);

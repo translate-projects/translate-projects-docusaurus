@@ -70,6 +70,16 @@ test('translates docs, blog, code.json and theme; cache skips what did not chang
   assert.strictEqual(api.count('/v1/translations/load-sources'), 1);
   assert.ok(translateCalls().every((r) => r.q.route_file.endsWith('intro.md')));
   assert.match(read(DOC('en')), /\[en\] Hola de nuevo/);
+
+  // force: everything is translated again although nothing changed
+  api.state.requests.length = 0;
+  assert.strictEqual(await run({ force: true }), 0);
+  assert.ok(
+    translateCalls().some(
+      (r) => r.q.target_lang === 'en' && r.q.route_file.endsWith('intro.md')
+    )
+  );
+  assert.ok(translateCalls().some((r) => r.q.route_file.endsWith('code.json')));
 });
 
 test('sends each text once with its route_file and cache_hash', async (t) => {
