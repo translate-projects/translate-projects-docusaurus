@@ -69,6 +69,7 @@ export default {
   targetLangs: ['es', 'fr', 'pt'],
   apiKey: process.env.TRANSLATE_PROJECTS_API_KEY,
   debug: false,
+  // any translateProject option works here too, e.g. theme: { ignoreKeys: [] }
 };
 ```
 
@@ -130,7 +131,9 @@ Options accepted by `translateProject`:
 | `theme.enable`         | `boolean`  | `true`             | Translate `docusaurus-theme-classic` JSON files.                      |
 | `theme.ignoreKeys`     | `string[]` | `[]`               | Theme keys to keep untranslated.                                      |
 
-> The CLI currently only reads `sourceLang`, `targetLangs`, `apiKey` and `debug`. Use the programmatic API for the other options.
+> The CLI accepts every option below too (`sourceLang`/`targetLangs` are aliases of `defaultLocale`/`locales`).
+>
+> The API URL defaults to `https://api.translateprojects.dev`; override it with the `TRANSLATE_PROJECTS_API_URL` env var.
 
 Supported source extensions: `.md`, `.mdx`, `.yml`, `.yaml`, `.json`, `.tsx`. Any other file is copied as-is.
 
@@ -139,8 +142,8 @@ Supported source extensions: `.md`, `.mdx`, `.yml`, `.yaml`, `.json`, `.tsx`. An
 ```bash
 npm install
 npm run build   # compile to dist/
+npm test        # build + node:test against a local mock API
 npm run lint
-npm run format
 ```
 
 ## Support
