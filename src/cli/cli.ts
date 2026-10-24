@@ -31,22 +31,12 @@ async function runCLI() {
   try {
     await Logger.info('Starting project translation...');
     const config = await loadConfig(configPath);
-    const debug = isDev || config.debug;
-    if (debug) {
-      await translateProject({
-        defaultLocale: config.sourceLang,
-        locales: config.targetLangs,
-        apiKey: config.apiKey,
-        debug: isDev || config.debug,
-      });
-      return;
-    }
-
+    // sourceLang/targetLangs are the CLI names; any other translateProject option passes through
     await translateProject({
-      defaultLocale: config.sourceLang,
-      locales: config.targetLangs,
-      apiKey: config.apiKey,
-      debug: isDev || config.debug,
+      ...config,
+      defaultLocale: config.sourceLang ?? config.defaultLocale,
+      locales: config.targetLangs ?? config.locales,
+      debug: isDev || Boolean(config.debug),
     });
   } catch (err: any) {
     await Logger.error(err.message);

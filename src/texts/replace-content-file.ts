@@ -14,7 +14,8 @@ export const replaceContentFile = ({
   let translatedContent = contentFile;
 
   for (const [key, value] of Object.entries(keysAndTexts)) {
-    const showValue = originalTranslations[key];
+    // Missing translation (API failure or new text): keep the source text
+    const showValue = originalTranslations?.[key] ?? value;
     const escapedValue = escapeCharactersRegExp(value as string);
     const regex = new RegExp(`{{${escapedValue}}}`, 'g');
     translatedContent = translatedContent.replace(regex, showValue);

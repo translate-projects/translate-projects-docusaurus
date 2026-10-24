@@ -37,7 +37,7 @@ export const docsTranslate = async ({
 
     const content = fs.readFileSync(item.path, 'utf8');
     const keysAndTexts = await extractKeysAndTexts(content);
-    const localeArray = defaultLocale ? [defaultLocale, ...locales] : locales;
+    const localeArray = [...new Set([defaultLocale, ...locales])];
 
     for (const locale of localeArray) {
       let translations: TypeJson = {};
@@ -69,6 +69,12 @@ export const docsTranslate = async ({
               route_file: item.path,
               cache_hash: item.cache_hash,
             });
+
+            if (!translations) {
+              await Logger.error(`❌ Not translated ${item.path} (${locale})`);
+              process.exitCode = 1;
+              continue;
+            }
 
             await updateFileCache({
               fileHash: key,

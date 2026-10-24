@@ -1,4 +1,5 @@
 import { validateChangesFiles } from 'translate-projects-core';
+import { Logger } from 'translate-projects-core/utils';
 import { processDirectory } from '../cache/processing';
 import { FilePathData } from '../types/file-path-data';
 
@@ -29,6 +30,8 @@ export const validateChangesServerFiles = async ({
   });
 
   if (!result?.data) {
+    await Logger.error(`❌ Could not check changes in ${dir}`);
+    process.exitCode = 1;
     return {};
   }
 

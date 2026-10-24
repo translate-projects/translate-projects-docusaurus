@@ -139,27 +139,20 @@ export async function translateProject({
     sourceLang: defaultLocale,
   });
 
-  // folder docs sync
-  const dirFiles = path.join('i18n', defaultLocale);
-
   // refhesh folder base
   await writeTranslationsCommand(defaultLocale);
 
-  if (!fs.existsSync(dirFiles) || config_base.recreateFiles) {
-    await Logger.info(`🔄 Recreating translations: ${defaultLocale} \n`);
-
-    for (const locale of locales) {
-      if (locale === defaultLocale) continue;
-      const folder_lang = path.join(config_base.outputDir, locale);
-      if (!fs.existsSync(folder_lang) || config_base.recreateFiles) {
-        await deleteJsonFilesFolder(folder_lang);
-        await writeTranslationsCommand(locale);
-        await Logger.info(`🔄 Recreating translations: ${locale} \n`);
-      }
+  for (const locale of locales) {
+    if (locale === defaultLocale) continue;
+    const folder_lang = path.join(config_base.outputDir, locale);
+    if (!fs.existsSync(folder_lang) || config_base.recreateFiles) {
+      await deleteJsonFilesFolder(folder_lang);
+      await writeTranslationsCommand(locale);
+      await Logger.info(`🔄 Recreating translations: ${locale} \n`);
     }
   }
 
-  const locales_config = [defaultLocale, ...locales];
+  const locales_config = [...new Set([defaultLocale, ...locales])];
 
   if (!blog_config.enable) {
     await Logger.info('Not translate blog \n');
@@ -180,7 +173,8 @@ export async function translateProject({
   if (blog_config.enable) {
     if (!fs.existsSync(blog_config.baseDir)) {
       await Logger.error(`The directory ${blog_config.baseDir} doesn't exist.`);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
 
     await Logger.success(` Syncing files blog... \n`);
@@ -217,8 +211,9 @@ export async function translateProject({
   if (docs_config.enable) {
     await Logger.success('🚀 Start translations documentation \n');
     if (!fs.existsSync(docs_config.baseDir)) {
-      Logger.error(`The directory ${docs_config.baseDir} doesn't exist.`);
-      process.exit(1);
+      await Logger.error(`The directory ${docs_config.baseDir} doesn't exist.`);
+      process.exitCode = 1;
+      return;
     }
 
     await Logger.info(`Syncing files documentation... \n`);
@@ -320,6 +315,4 @@ export async function translateProject({
   await Logger.success('✅ Finish translated All 📋 \n');
 
   await logExecutionTime(time_start);
-
-  process.exit(0);
 }

@@ -66,17 +66,18 @@ export const translateFilesJsonTheme = async ({
               cache_hash: item.cache_hash,
             });
 
-            await updateFileCache({
-              fileHash: key,
-              translations: { [locale]: translations },
-            });
-
             if (!translations) {
               await Logger.error(
                 `❌ Don't translate file ${item.path} to ${locale}`
               );
+              process.exitCode = 1;
               continue;
             }
+
+            await updateFileCache({
+              fileHash: key,
+              translations: { [locale]: translations },
+            });
           }
         }
       }

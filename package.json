@@ -25,7 +25,8 @@
     "lint": "eslint",
     "format": "prettier --write .",
     "lint:fix": "eslint --fix",
-    "prepare": "husky"
+    "prepare": "husky",
+    "test": "npm run build && node --test 'test/*.test.js'"
   },
   "bin": {
     "translate-projects-docusaurus": "./dist/cli/cli.js"
@@ -43,7 +44,7 @@
   ],
   "dependencies": {
     "chokidar": "^4.0.3",
-    "translate-projects-core": "0.0.9"
+    "translate-projects-core": "^0.0.10"
   },
   "devDependencies": {
     "@types/node": "^22.10.10",
@@ -54,7 +55,8 @@
     "lint-staged": "^15.4.3",
     "prettier": "3.5.1",
     "ts-node": "^10.9.2",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "ws": "^8.18.0"
   },
   "keywords": [
     "translate projects",

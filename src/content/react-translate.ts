@@ -119,17 +119,18 @@ export const reactTranslate = async ({
               cache_hash: item.cache_hash,
             });
 
+            if (!translations) {
+              await Logger.error(`❌ Not translated ${filePath} (${locale})`);
+              process.exitCode = 1;
+              continue;
+            }
+
             await updateFileCache({
               fileHash: key,
               translations: { [locale]: translations },
             });
           }
         }
-      }
-
-      if (!translations) {
-        await Logger.error(`Don't translate file ${filePath} to ${locale}`);
-        continue;
       }
 
       const restructuredJson = restructureJson(
