@@ -1,6 +1,6 @@
 # Translate Projects Docusaurus
 
-Easily globalize your Docusaurus documentation. **Translate Projects Docusaurus** translates your docs, blog, React pages (`code.json`) and theme strings into multiple languages using the [Translate Projects](https://translateprojects.neiderruiz.com) API, and writes the results into Docusaurus' `i18n` structure.
+Easily globalize your Docusaurus documentation. **Translate Projects Docusaurus** translates your docs, blog, React pages (`code.json`) and theme strings into multiple languages using the [Translate Projects](https://translateprojects.dev) API, and writes the results into Docusaurus' `i18n` structure.
 
 [See full documentation](https://doc.translateprojects.dev/docs/frameworks-javascript/docusaurus)
 
