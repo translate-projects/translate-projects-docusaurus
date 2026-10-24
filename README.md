@@ -1,15 +1,147 @@
-# Translate projects Docusaurus
+# Translate Projects Docusaurus
 
-Easily globalize your project documentation with **Translate Projects Docusaurus**, a powerful tool designed to simplify the translation and localization of your Docusaurus-based documentation. Whether you're working on open-source projects or enterprise documentation, this tool ensures your content is accessible to a global audience.
+Easily globalize your Docusaurus documentation. **Translate Projects Docusaurus** translates your docs, blog, React pages (`code.json`) and theme strings into multiple languages using the [Translate Projects](https://translateprojects.neiderruiz.com) API, and writes the results into Docusaurus' `i18n` structure.
 
-[See documentation](https://translateprojects.neiderruiz.com/docs/frameworks-javascript/docusaurus)
+[See full documentation](https://translateprojects.neiderruiz.com/docs/frameworks-javascript/docusaurus)
 
 ## Features
 
-- **Easy Integration**: Seamlessly integrate with your existing Docusaurus project.
-- **Multi-language Support**: Translate your documentation into multiple languages effortlessly.
-- **Customizable**: Tailor the translation process to fit your project's needs.
-- **Open Source**: Free to use and open to contributions.
+- **Docs & blog translation**: write your source content in `translate/docs` and `translate/blog`, wrap translatable text in `{{ }}`, and get clean files for every locale.
+- **React pages & theme**: translates `i18n/<lang>/code.json` and `docusaurus-theme-classic` JSON files.
+- **Incremental**: files are hashed and cached; only new or changed files are sent to the API.
+- **Assets synced**: non-text files (images, etc.) are copied to every locale folder.
+- **Watch mode**: `--dev` watches `./translate` and syncs changes to the default locale instantly, without calling the API.
+
+## Installation
+
+```bash
+npm install -D translate-projects-docusaurus
+```
+
+Your Docusaurus project must have the standard `write-translations` script (`docusaurus write-translations`) in `package.json`; the tool runs `npm run write-translations -- --locale <lang>` internally.
+
+## How it works
+
+1. Write your content in the source folders instead of `docs/` and `blog/`:
+
+   ```
+   translate/
+   ├── docs/
+   │   └── intro.md
+   └── blog/
+       └── 2025-01-01-welcome.md
+   ```
+
+2. Wrap every text you want translated in double braces:
+
+   ```md
+   ---
+   title: { { Getting started } }
+   ---
+
+   # {{Welcome to my project}}
+
+   {{This paragraph will be translated.}}
+   ```
+
+3. Run the translation. The tool generates:
+
+   | Source                                           | Default locale output | Other locales output                                    |
+   | ------------------------------------------------ | --------------------- | ------------------------------------------------------- |
+   | `translate/docs/**`                              | `docs/**`             | `i18n/<lang>/docusaurus-plugin-content-docs/current/**` |
+   | `translate/blog/**`                              | `blog/**`             | `i18n/<lang>/docusaurus-plugin-content-blog/**`         |
+   | `i18n/<default>/code.json`                       | —                     | `i18n/<lang>/code.json`                                 |
+   | `i18n/<default>/docusaurus-theme-classic/*.json` | —                     | `i18n/<lang>/docusaurus-theme-classic/*.json`           |
+
+   The `{{ }}` markers are removed from the output files.
+
+> Edit only files in `translate/`. Files in `docs/`, `blog/` and `i18n/` are generated and will be overwritten.
+
+## Usage
+
+### CLI
+
+Create `translate.config.js` (or `translate.config.mjs`) in your project root:
+
+```js
+export default {
+  sourceLang: 'en',
+  targetLangs: ['es', 'fr', 'pt'],
+  apiKey: process.env.TRANSLATE_PROJECTS_API_KEY,
+  debug: false,
+};
+```
+
+Add scripts to `package.json`:
+
+```json
+{
+  "scripts": {
+    "translate": "translate-projects-docusaurus",
+    "translate:dev": "translate-projects-docusaurus --dev"
+  }
+}
+```
+
+```bash
+npm run translate       # translate everything
+npm run translate:dev   # watch ./translate and sync the default locale
+```
+
+### Programmatic API
+
+For full control (custom folders, disabling sections), call `translateProject` directly:
+
+```js
+// translate.js
+const { translateProject } = require('translate-projects-docusaurus');
+
+translateProject({
+  defaultLocale: 'en',
+  locales: ['es', 'fr'],
+  apiKey: process.env.TRANSLATE_PROJECTS_API_KEY,
+  debug: false,
+});
+```
+
+```bash
+node translate.js
+```
+
+## Configuration
+
+Options accepted by `translateProject`:
+
+| Option                 | Type       | Default            | Description                                                           |
+| ---------------------- | ---------- | ------------------ | --------------------------------------------------------------------- |
+| `defaultLocale`        | `string`   | — (required)       | Source language of your content.                                      |
+| `locales`              | `string[]` | — (required)       | Target languages.                                                     |
+| `apiKey`               | `string`   | — (required)       | Your Translate Projects API key.                                      |
+| `debug`                | `boolean`  | `true`             | `true` runs watch mode only (no API calls). Set `false` to translate. |
+| `config.outputDir`     | `string`   | `./i18n`           | Docusaurus i18n folder.                                               |
+| `config.recreateFiles` | `boolean`  | `false`            | Regenerate `i18n/<lang>` files with `write-translations`.             |
+| `docs.enable`          | `boolean`  | `true`             | Translate docs.                                                       |
+| `docs.baseDir`         | `string`   | `./translate/docs` | Source docs folder.                                                   |
+| `docs.outputDir`       | `string`   | `./docs`           | Generated docs folder (default locale).                               |
+| `blog.enable`          | `boolean`  | `true`             | Translate blog.                                                       |
+| `blog.baseDir`         | `string`   | `./translate/blog` | Source blog folder.                                                   |
+| `blog.outputDir`       | `string`   | `./blog`           | Generated blog folder (default locale).                               |
+| `react.enable`         | `boolean`  | `true`             | Translate `code.json` (React pages/components).                       |
+| `theme.enable`         | `boolean`  | `true`             | Translate `docusaurus-theme-classic` JSON files.                      |
+| `theme.ignoreKeys`     | `string[]` | `[]`               | Theme keys to keep untranslated.                                      |
+
+> The CLI currently only reads `sourceLang`, `targetLangs`, `apiKey` and `debug`. Use the programmatic API for the other options.
+
+Supported source extensions: `.md`, `.mdx`, `.yml`, `.yaml`, `.json`, `.tsx`. Any other file is copied as-is.
+
+## Development
+
+```bash
+npm install
+npm run build   # compile to dist/
+npm run lint
+npm run format
+```
 
 ## Support
 
@@ -25,3 +157,7 @@ If you have any questions, need help, or want to contribute, feel free to reach 
 If you find this project useful, consider buying me a coffee to help me keep improving it. Your support means a lot! ☕
 
 [![Buy me a coffee](https://img.buymeacoffee.com/button-api/?text=Buy%20me%20a%20coffee&emoji=☕&slug=neiderruiz&button_colour=FFDD00&font_colour=000000&font_family=Cookie&outline_colour=000000&coffee_colour=ffffff)](https://www.buymeacoffee.com/neiderruiz)
+
+## License
+
+MIT
