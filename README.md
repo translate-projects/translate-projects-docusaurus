@@ -54,7 +54,7 @@ Your Docusaurus project must have the standard `write-translations` script (`doc
    | `i18n/<default>/code.json`                       | —                     | `i18n/<lang>/code.json`                                 |
    | `i18n/<default>/docusaurus-theme-classic/*.json` | —                     | `i18n/<lang>/docusaurus-theme-classic/*.json`           |
 
-   The `{{ }}` markers are removed from the output files.
+   The `{{ }}` markers are removed from the output files. To write literal braces (e.g. i18next's `{{lng}}` inside a code block) escape them: `\{{lng}}` is written as `{{lng}}` and never sent for translation.
 
 > Edit only files in `translate/`. Files in `docs/`, `blog/` and `i18n/` are generated and will be overwritten.
 

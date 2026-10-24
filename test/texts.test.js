@@ -48,3 +48,21 @@ test('pickTranslations keeps only the file keys and lists the missing ones', () 
   );
   assert.deepStrictEqual(pickTranslations(null, { a: 'a' }).missing, ['a']);
 });
+
+test('\\{{ keeps literal braces and is not sent; "$" in texts stays literal', async () => {
+  const content =
+    '# {{Hola}}\n\n```js\nloadPath: "/locales/\\{{lng}}/\\{{ns}}.json"\n```\n{{Precio $&}}';
+  const keys = await extractKeysAndTexts(content);
+  assert.deepStrictEqual(Object.values(keys).sort(), ['Hola', 'Precio $&']);
+  const tr = {};
+  for (const [k, v] of Object.entries(keys))
+    tr[k] = v === 'Hola' ? 'Hello' : 'Price $& $1';
+  assert.strictEqual(
+    replaceContentFile({
+      contentFile: content,
+      keysAndTexts: keys,
+      originalTranslations: tr,
+    }),
+    '# Hello\n\n```js\nloadPath: "/locales/{{lng}}/{{ns}}.json"\n```\nPrice $& $1'
+  );
+});

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { TypeListLang } from 'translate-projects-core/types';
-import { escapeCharactersRegExp, extractKeysAndTexts } from '../texts';
+import { extractKeysAndTexts, replaceContentFile } from '../texts';
 type ReadFileType = {
   filePath: string;
   locale: TypeListLang;
@@ -25,13 +25,12 @@ export const contentFileSync = async ({
   const content = fs.readFileSync(filePath, 'utf8');
   const keysAndTexts = await extractKeysAndTexts(content);
 
-  let translatedContent = content;
-
-  for (const value of Object.values(keysAndTexts)) {
-    const escapedValue = escapeCharactersRegExp(value as string);
-    const regex = new RegExp(`{{${escapedValue}}}`, 'g');
-    translatedContent = translatedContent.replace(regex, value);
-  }
+  // dev preview: source texts without the {{ }} marks
+  const translatedContent = replaceContentFile({
+    contentFile: content,
+    keysAndTexts,
+    originalTranslations: keysAndTexts,
+  });
 
   // is folder doc
   if (base_folder == 'translate/docs') {

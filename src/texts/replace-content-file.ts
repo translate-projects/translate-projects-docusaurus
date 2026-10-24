@@ -17,9 +17,9 @@ export const replaceContentFile = ({
     // Missing translation (API failure or new text): keep the source text
     const showValue = originalTranslations?.[key] ?? value;
     const escapedValue = escapeCharactersRegExp(value as string);
-    const regex = new RegExp(`{{${escapedValue}}}`, 'g');
-    translatedContent = translatedContent.replace(regex, showValue);
+    const regex = new RegExp(`(?<!\\\\){{${escapedValue}}}`, 'g');
+    translatedContent = translatedContent.replace(regex, () => showValue); // fn: "$&" in a text is literal
   }
 
-  return translatedContent;
+  return translatedContent.replace(/\\{{/g, '{{');
 };

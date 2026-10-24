@@ -3,7 +3,8 @@ import { generateHashText } from 'translate-projects-core/utils';
 export const extractKeysAndTexts = async (
   content: string
 ): Promise<Record<string, string>> => {
-  const regex = /{{([\s\S]*?)}}/g;
+  // \{{ escapes literal braces (e.g. i18next's {{lng}} in a code block): not a text to translate
+  const regex = /(?<!\\){{([\s\S]*?)}}/g;
   let match;
   const result: Record<string, string> = {};
 
