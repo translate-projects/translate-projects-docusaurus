@@ -35,9 +35,10 @@ Your Docusaurus project must have the standard `write-translations` script (`doc
 
 2. Wrap every text you want translated in double braces:
 
+   <!-- prettier-ignore -->
    ```md
    ---
-   title: { { Getting started } }
+   title: {{Getting started}}
    ---
 
    # {{Welcome to my project}}
@@ -134,7 +135,7 @@ Options accepted by `translateProject`:
 | `theme.enable`         | `boolean`  | `true`             | Translate `docusaurus-theme-classic` JSON files.                      |
 | `theme.ignoreKeys`     | `string[]` | `[]`               | Theme keys to keep untranslated.                                      |
 
-> The CLI accepts every option below too (`sourceLang`/`targetLangs` are aliases of `defaultLocale`/`locales`).
+> The CLI accepts every option above too (`sourceLang`/`targetLangs` are aliases of `defaultLocale`/`locales`).
 >
 > The API URL defaults to `https://api.translateprojects.dev`; override it with the `TRANSLATE_PROJECTS_API_URL` env var.
 
